@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ExpoCredit | Trivia Broker University</title>
+<style>
+  :root{
+    --bg1:#03142e; --bg2:#06306b; --cyan:#12a8ff; --cyan2:#00d0ff;
+    --card:rgba(8,30,66,.78); --line:rgba(18,168,255,.45);
+    --ok:#2ee59d; --bad:#ff5d73; --txt:#f2f7ff; --muted:#9db7d9;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    min-height:100vh; font-family:"Poppins","Segoe UI",Roboto,Arial,sans-serif;
+    color:var(--txt);
+    background:radial-gradient(1200px 600px at 20% -10%,#0a3d85 0%,transparent 60%),
+               radial-gradient(900px 500px at 100% 100%,#07509e 0%,transparent 55%),
+               linear-gradient(160deg,var(--bg1),#020b1c);
+    display:flex; align-items:center; justify-content:center; padding:24px 16px;
+  }
+  .wrap{width:100%; max-width:720px}
+  .logo{display:block; width:220px; max-width:60%; margin:0 auto 18px}
+  .card{
+    background:var(--card); border:1.5px solid var(--line); border-radius:22px;
+    padding:30px 28px; backdrop-filter:blur(6px);
+    box-shadow:0 20px 60px rgba(0,0,0,.45), 0 0 40px rgba(18,168,255,.12);
+  }
+  h1{font-size:clamp(1.6rem,5vw,2.2rem); text-align:center; line-height:1.15}
+  h1 span{color:var(--cyan)}
+  .sub{color:var(--muted); text-align:center; margin:12px 0 24px; font-size:.98rem}
+  .rules{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:26px}
+  .chip{border:1px solid var(--line); border-radius:999px; padding:7px 14px; font-size:.85rem; color:var(--cyan2)}
+  button{font-family:inherit; cursor:pointer}
+  .btn{
+    display:block; margin:0 auto; border:0; border-radius:14px; padding:14px 34px;
+    font-size:1.05rem; font-weight:700; color:#03142e;
+    background:linear-gradient(90deg,var(--cyan2),var(--cyan));
+    box-shadow:0 8px 24px rgba(18,168,255,.35); transition:transform .15s, box-shadow .15s;
+  }
+  .btn:hover{transform:translateY(-2px); box-shadow:0 12px 30px rgba(18,168,255,.5)}
+  .btn:disabled{opacity:.4; cursor:not-allowed; transform:none}
+  .hidden{display:none}
+
+  .top{display:flex; justify-content:space-between; align-items:center; font-size:.9rem; color:var(--muted); margin-bottom:10px}
+  .score-pill{color:var(--cyan2); font-weight:700}
+  .bar{height:10px; border-radius:99px; background:rgba(255,255,255,.1); overflow:hidden; margin-bottom:24px}
+  .bar > i{display:block; height:100%; width:0; border-radius:99px;
+    background:linear-gradient(90deg,var(--cyan2),var(--cyan)); transition:width .5s ease}
+  .q{font-size:clamp(1.15rem,3.6vw,1.45rem); font-weight:600; line-height:1.35; margin-bottom:20px}
+  .adv{display:block; width:fit-content; margin-bottom:10px; padding:4px 12px; border-radius:999px; font-size:.78rem; font-weight:700;
+    color:#03142e; background:linear-gradient(90deg,#ffd84d,#ffb02e)}
+  .q{display:block}
+  .opts{display:grid; gap:12px}
+  .opt{
+    text-align:left; padding:14px 16px; border-radius:14px; font-size:1rem; color:var(--txt);
+    background:rgba(255,255,255,.04); border:1.5px solid var(--line); transition:all .15s;
+    display:flex; gap:12px; align-items:flex-start;
+  }
+  .opt b{color:var(--cyan); min-width:22px}
+  .opt:hover:not(:disabled){background:rgba(18,168,255,.15); transform:translateX(3px)}
+  .opt:disabled{cursor:default}
+  .opt.ok{border-color:var(--ok); background:rgba(46,229,157,.15)}
+  .opt.bad{border-color:var(--bad); background:rgba(255,93,115,.15)}
+  .fb{margin-top:18px; padding:14px 16px; border-radius:14px; font-size:.95rem; line-height:1.5;
+    border-left:4px solid var(--cyan); background:rgba(18,168,255,.1)}
+  .fb strong.ok{color:var(--ok)} .fb strong.bad{color:var(--bad)}
+  .next{margin-top:20px}
+
+  .ring{--p:0; width:190px; height:190px; border-radius:50%; margin:6px auto 18px;
+    background:conic-gradient(var(--cyan2) calc(var(--p)*1%), rgba(255,255,255,.1) 0);
+    display:grid; place-items:center; transition:--p 1s}
+  .ring div{width:150px; height:150px; border-radius:50%; background:#06214a; display:grid; place-items:center;
+    font-size:2.8rem; font-weight:800; color:var(--cyan2)}
+  .res-title{font-size:1.5rem; text-align:center; font-weight:700}
+  .res-msg{color:var(--muted); text-align:center; margin:10px 0 22px; line-height:1.5}
+  .res-detail{text-align:center; color:var(--txt); margin-bottom:22px; font-size:.95rem}
+  footer{text-align:center; color:var(--muted); font-size:.8rem; margin-top:18px}
+  @media(max-width:480px){.card{padding:22px 16px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <img class="logo" alt="ExpoCredit Financial Group" src="data:image/png;base64,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">
+
+  <!-- INICIO -->
+  <section class="card" id="start">
+    <h1>Trivia <span>Broker University</span></h1>
+    <p class="sub">Pon a prueba lo que aprendiste sobre ExpoCredit y su programa de brókers.</p>
+    <div class="rules">
+      <span class="chip">14 preguntas</span>
+      <span class="chip">Cada acierto suma un %</span>
+      <span class="chip">4 avanzadas valen más</span>
+      <span class="chip">Meta: 100%</span>
+    </div>
+    <button class="btn" id="btnStart">Comenzar</button>
+  </section>
+
+  <!-- PREGUNTAS -->
+  <section class="card hidden" id="quiz">
+    <div class="top">
+      <span id="counter">Pregunta 1 de 10</span>
+      <span class="score-pill" id="live">Acumulado: 0%</span>
+    </div>
+    <div class="bar"><i id="bar"></i></div>
+    <div class="q" id="question"></div>
+    <div class="opts" id="options"></div>
+    <div class="fb hidden" id="fb"></div>
+    <button class="btn next hidden" id="btnNext">Siguiente</button>
+  </section>
+
+  <!-- RESULTADO -->
+  <section class="card hidden" id="result">
+    <div class="ring" id="ring"><div id="pct">0%</div></div>
+    <div class="res-title" id="resTitle"></div>
+    <p class="res-msg" id="resMsg"></p>
+    <p class="res-detail" id="resDetail"></p>
+    <button class="btn" id="btnRestart">Intentar de nuevo</button>
+  </section>
+
+  <footer>ExpoCredit Financial Group · www.expocredit.com</footer>
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    q: "¿Cuántos años de experiencia tiene ExpoCredit como socio financiero para empresas?",
+    o: ["Más de 10 años", "Más de 26 años", "Más de 40 años", "Menos de 5 años"],
+    a: 1,
+    w: 6,
+    e: "ExpoCredit lleva más de 26 años siendo un socio financiero estratégico para empresas en todo el mundo."
+  },
+  {
+    q: "¿Cuál es la sede principal de ExpoCredit?",
+    o: ["Ciudad de México", "Bogotá", "Miami, Estados Unidos", "Lima"],
+    a: 2,
+    w: 6,
+    e: "La sede principal está en Miami (Brickell Ave.). Además hay oficinas comerciales en México, Colombia y Perú."
+  },
+  {
+    q: "En el factoraje de ExpoCredit, ¿qué porcentaje de la factura se le adelanta al cliente?",
+    o: ["Entre 20% y 30%", "Entre 40% y 50%", "Entre 80% y 90%", "El 100% siempre"],
+    a: 2,
+    w: 6,
+    e: "ExpoCredit avanza al cliente entre el 80% y el 90% de la factura, y devuelve el resto (20%–10%) menos el costo del servicio."
+  },
+  {
+    q: "¿Cuál es el rango de tasas mensuales de la oferta de ExpoCredit?",
+    o: ["Del 0.1% al 0.5%", "Del 1.1% al 1.6%", "Del 3% al 5%", "Del 6% al 8%"],
+    a: 1,
+    w: 6,
+    e: "Las tasas van desde el 1.1% hasta el 1.6% mensual, sin cláusulas de permanencia y sin costos adicionales."
+  },
+  {
+    q: "Una vez aprobada la operación, ¿en cuánto tiempo se realiza el desembolso?",
+    o: ["En 24 horas", "En 7 días", "En 15 días", "En 30 días"],
+    a: 0,
+    w: 6,
+    e: "El desembolso se realiza en un máximo de 24 horas."
+  },
+  {
+    q: "¿Entre qué porcentajes suelen oscilar las comisiones de los brókers sobre los ingresos generados por cada operación referida?",
+    o: ["Entre 1% y 2%", "Entre 5% y 10%", "Entre 25% y 30%", "Entre 50% y 60%"],
+    a: 1,
+    w: 6,
+    e: "Las comisiones de brókers generalmente oscilan entre el 5% y el 10% de los ingresos generados por cada operación referida."
+  },
+  {
+    q: "Una factura de $1,000,000 con comisión de factoraje de 1.5% mensual a 60 días (2 meses) y un bróker con el 10% de comisión. ¿Cuánto gana el bróker?",
+    o: ["$1,500", "$3,000", "$15,000", "$30,000"],
+    a: 1,
+    w: 6,
+    e: "Ingreso generado: $1,000,000 × 1.5% × 2 = $30,000. Comisión del bróker: $30,000 × 10% = $3,000."
+  },
+  {
+    q: "¿Cuándo recibe el bróker el pago de su comisión?",
+    o: ["El mismo día que refiere al cliente", "Dentro de los primeros 15 días del mes siguiente", "Cada 6 meses", "Solo al final del año"],
+    a: 1,
+    w: 6,
+    e: "Al cierre de cada mes se emite el reporte de comisiones y el pago llega dentro de los primeros 15 días del mes siguiente."
+  },
+  {
+    q: "¿Cómo se llama la plataforma segura de ExpoCredit donde el bróker se registra, carga sus documentos y empieza a referir?",
+    o: ["ExpoPay", "My Expo", "BrokerNet", "FactorApp"],
+    a: 1,
+    w: 6,
+    e: "My Expo centraliza todo el proceso del bróker: registro, documentación, capacitación y seguimiento en un solo lugar."
+  },
+  {
+    q: "¿Cuándo se realiza la sesión de Broker University para nuevos brókers?",
+    o: ["Primer lunes de cada mes", "Segundo viernes de cada mes", "Último viernes de cada mes", "Todos los días"],
+    a: 1,
+    w: 6,
+    e: "Broker University es el segundo viernes de cada mes. El último viernes se hace ExpoCredit Academy con temas de actualidad y estrategias comerciales."
+  },
+  {
+    adv: true, w: 10,
+    q: "Una factura de $500,000 se financia a 90 días (3 meses) con comisión de factoraje de 1.2% mensual. Si el bróker tiene el 8% de comisión, ¿cuánto gana por esta operación?",
+    o: ["$1,440", "$1,800", "$4,800", "$18,000"],
+    a: 0,
+    e: "Ingreso generado: $500,000 × 1.2% × 3 = $18,000. Comisión del bróker: $18,000 × 8% = $1,440."
+  },
+  {
+    adv: true, w: 10,
+    q: "¿Sobre qué base se calcula la comisión del bróker y qué tarifas NO se incluyen?",
+    o: ["Sobre el valor total de la factura; no incluye el descuento", "Sobre el beneficio bruto de la operación; no incluye tarifas de solicitud, procesamiento, auditoría, legales ni cierre", "Sobre el valor del desembolso; incluye todas las tarifas", "Sobre las ventas anuales del cliente; no incluye impuestos"],
+    a: 1,
+    e: "La comisión se calcula sobre el beneficio bruto generado por la operación. No se incluyen las tarifas de solicitud, procesamiento, auditoría, legales y cierre."
+  },
+  {
+    adv: true, w: 10,
+    q: "En el proceso de aprobación y apertura de línea, ¿qué ocurre justo después de presentar la propuesta al cliente en 24 horas (etapa Propuesta → etapa Suscripción)?",
+    o: ["El cliente envía los documentos para su primera operación", "La aseguradora estudia el nivel de riesgo del deudor", "Se desembolsa el adelanto en la cuenta del cliente", "Crédito, operaciones y compliance firman el contrato"],
+    a: 1,
+    e: "Tras la propuesta (etapas 1–3), inicia la Suscripción: la aseguradora estudia el riesgo del deudor, el cliente presenta un segundo paquete de información y Crédito, Operaciones y Compliance dan un dictamen. El desembolso llega al final, en la Ejecución de contrato."
+  },
+  {
+    adv: true, w: 10,
+    q: "¿Cuál de las siguientes facturas SÍ puede financiar ExpoCredit mediante factoraje?",
+    o: ["Ventas a consignación", "Ventas progresivas", "Productos o servicios ya entregados y aprobados por el deudor", "Mercancía pendiente de despacho que el deudor aún no recibe"],
+    a: 2,
+    e: "ExpoCredit trabaja con productos y servicios entregados y aprobados por el deudor. No financia ventas a consignación ni ventas progresivas."
+  }
+];
+
+const TOTAL = QUESTIONS.reduce((s,q)=>s+q.w,0); // debe sumar 100
+const $ = id => document.getElementById(id);
+let idx = 0, correct = 0, score = 0, done = 0, locked = false;
+
+function shuffle(arr){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function show(id){ ["start","quiz","result"].forEach(s=>$(s).classList.toggle("hidden", s!==id)); }
+
+function start(){ idx=0; correct=0; score=0; done=0; show("quiz"); render(); }
+
+function render(){
+  locked=false;
+  const item = QUESTIONS[idx];
+  $("counter").textContent = `Pregunta ${idx+1} de ${QUESTIONS.length}`;
+  $("live").textContent = `Acumulado: ${score}%`;
+  $("bar").style.width = done + "%";
+  $("question").innerHTML = (item.adv ? '<span class="adv">⭐ Pregunta avanzada · vale '+item.w+'%</span>' : '') + "";
+  $("question").appendChild(document.createTextNode(item.q));
+  $("fb").classList.add("hidden");
+  $("btnNext").classList.add("hidden");
+  $("btnNext").textContent = idx === QUESTIONS.length-1 ? "Ver mi resultado" : "Siguiente";
+  const box = $("options"); box.innerHTML = "";
+  const order = shuffle(item.o.map((t,i)=>({t,i})));
+  order.forEach((opt,n)=>{
+    const b = document.createElement("button");
+    b.className = "opt";
+    b.innerHTML = `<b>${"ABCD"[n]}.</b><span></span>`;
+    b.querySelector("span").textContent = opt.t;
+    b.onclick = () => answer(b, opt.i === item.a, box);
+    b.dataset.right = opt.i === item.a ? "1" : "0";
+    box.appendChild(b);
+  });
+}
+
+function answer(btn, isRight, box){
+  if(locked) return; locked = true;
+  [...box.children].forEach(b=>{ b.disabled = true; if(b.dataset.right==="1") b.classList.add("ok"); });
+  const item = QUESTIONS[idx];
+  done += item.w;
+  if(isRight){ correct++; score += item.w; } else { btn.classList.add("bad"); }
+  const fb = $("fb");
+  fb.innerHTML = isRight
+    ? `<strong class="ok">¡Correcto! +${item.w}%</strong><br>${item.e}`
+    : `<strong class="bad">Incorrecto (+0%)</strong><br>${item.e}`;
+  fb.classList.remove("hidden");
+  $("live").textContent = `Acumulado: ${score}%`;
+  $("bar").style.width = done + "%";
+  $("btnNext").classList.remove("hidden");
+}
+
+function next(){
+  idx++;
+  if(idx >= QUESTIONS.length) finish(); else render();
+}
+
+function finish(){
+  show("result");
+  const pct = score;
+  $("pct").textContent = pct + "%";
+  $("ring").style.setProperty("--p", pct);
+  let t, m;
+  if(pct === 100){ t="¡Bróker Élite! 🏆"; m="Dominas el programa de ExpoCredit al 100%. Estás listo para empezar a referir y generar comisiones."; }
+  else if(pct >= 70){ t="¡Muy buen trabajo! 🚀"; m="Tienes una base sólida. Repasa los detalles que fallaste y estarás listo para referir con confianza."; }
+  else if(pct >= 40){ t="Vas por buen camino 📈"; m="Aún hay conceptos por reforzar. Revisa la presentación de Broker University y vuelve a intentarlo."; }
+  else { t="¡Es hora de repasar! 📚"; m="No te preocupes: revisa la presentación con calma, asiste a Broker University y prueba de nuevo."; }
+  $("resTitle").textContent = t;
+  $("resMsg").textContent = m;
+  $("resDetail").textContent = `Respondiste correctamente ${correct} de ${QUESTIONS.length} preguntas y sumaste ${score}% de ${TOTAL}%.`;
+}
+
+$("btnStart").onclick = start;
+$("btnNext").onclick = next;
+$("btnRestart").onclick = start;
+</script>
+</body>
+</html>
